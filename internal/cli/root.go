@@ -22,6 +22,8 @@ func Execute() error {
 	switch args[0] {
 	case "daemon":
 		return runDaemon(args[1:])
+	case "install":
+		return runInstall()
 	case "alert":
 		if len(args) < 2 {
 			return ErrUsage
@@ -49,6 +51,7 @@ func PrintUsage(w io.Writer) {
 	fmt.Fprintln(w, "Usage:")
 	fmt.Fprintln(w, "  batsig                # monitor battery and send alerts")
 	fmt.Fprintln(w, "  batsig daemon         # detach and run the monitor in the background")
+	fmt.Fprintln(w, "  batsig install        # install batsig binary, notification sound, and alerts to your local config")
 	fmt.Fprintln(w, "  batsig alert new <percentage> <message>")
 	fmt.Fprintln(w, "  batsig alert set <percentage> <message>")
 	fmt.Fprintln(w, "  batsig alert clear <percentage>")
