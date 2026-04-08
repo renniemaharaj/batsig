@@ -16,6 +16,15 @@ func (s BatteryStatus) IsDischarging() bool {
 	return strings.EqualFold(s.State, "discharging")
 }
 
+func (s BatteryStatus) IsCharging() bool {
+	switch strings.ToLower(s.State) {
+	case "charging", "fully-charged":
+		return true
+	default:
+		return false
+	}
+}
+
 func Status() (BatteryStatus, error) {
 	path, err := BatteryDevice()
 	if err != nil {

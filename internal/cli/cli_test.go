@@ -50,11 +50,11 @@ func TestAlertFileLifecycle(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if err := createAlert(80, "charge test"); err != nil {
+	if err := createAlert(80, "charge test", false); err != nil {
 		t.Fatal(err)
 	}
 
-	message, err := readAlertMessage(80)
+	message, err := readAlertMessage(80, false)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -62,7 +62,7 @@ func TestAlertFileLifecycle(t *testing.T) {
 		t.Fatalf("unexpected alert message: %q", message)
 	}
 
-	if err := removeAlert(80); err != nil {
+	if err := removeAlert(80, false); err != nil {
 		t.Fatal(err)
 	}
 
@@ -101,7 +101,7 @@ func TestExecuteSetCommand(t *testing.T) {
 		t.Fatalf("Execute() = %v", err)
 	}
 
-	message, err := readAlertMessage(50)
+	message, err := readAlertMessage(50, false)
 	if err != nil {
 		t.Fatal(err)
 	}

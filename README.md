@@ -11,14 +11,28 @@ Alerts are stored in the XDG config directory as `batsig/alerts` (`$XDG_CONFIG_H
   - Detach and run the monitor in the background.
 - `batsig install`
   - Install the `batsig` binary to your user bin directory, copy `notification.wav` to your config, and pre-install the local `alerts` folder.
-- `batsig alert new <percentage> <message>`
-  - Create or update an alert for the given percentage.
-- `batsig alert set <percentage> <message>`
+- `batsig alert -c <message>`
+  - Set the charging state alert message for when wall power is connected.
+- `batsig alert -d <message>`
+  - Set the discharging state alert message for when wall power is disconnected.
+- `batsig alert new [-c] <percentage> <message>`
+  - Create or update an alert in the discharging folder by default, or in the charging folder when `-c` is used.
+- `batsig alert set [-c] <percentage> <message>`
   - Create a new alert or override an existing one.
-- `batsig alert clear <percentage>`
-  - Remove the saved alert for the given percentage.
-- `batsig alert test <percentage>`
-  - Trigger the alert notification immediately for testing.
+- `batsig alert clear [-c] <percentage>`
+  - Remove the saved alert from the selected folder.
+- `batsig alert clear -c`
+  - Remove the charging state alert.
+- `batsig alert clear -d`
+  - Remove the discharging state alert.
+- `batsig alert test [-c] <percentage>`
+  - Trigger a specific alert for testing.
+- `batsig alert test -c`
+  - Trigger the charging state alert for testing.
+- `batsig alert test -d`
+  - Trigger the discharging state alert for testing.
+- `batsig alert mv <percentage> <charging|discharging>`
+  - Move an alert between the charging and discharging folders.
 - `batsig alert list`
   - List all configured alerts and their messages.
 
@@ -28,14 +42,17 @@ batsig can play an accompanying audio notification when alerts are shown.
 
 - Set `BATSIG_NOTIFY_AUDIO=1` to play the default system notification sound.
 - Set `BATSIG_NOTIFY_SOUND=<event>` to play a libcanberra event ID, e.g. `message`.
-- Set `BATSIG_NOTIFY_SOUND=/path/to/sound.ogg` to play a local audio file.- If `notification.wav` exists in your config directory, batsig will use that file automatically.
+- Set `BATSIG_NOTIFY_SOUND=/path/to/sound.ogg` to play a local audio file.
+- If `notification.wav` exists in your config directory, batsig will use that file automatically.
   Audio playback requires `canberra-gtk-play` for sound events, or `paplay` / `aplay` for audio files.
 
 ## Alert storage
 
-- Alert file path: `alerts/<percentage>`
-- Example: `alerts/100`
-- File content: notification text to display when the battery reaches that percentage.
+- Discharging alerts: `alerts/<percentage>`
+- Charging alerts: `alerts/charging/<percentage>`
+- Charging state alert: `alerts/state/charging`
+- Discharging state alert: `alerts/state/discharging`
+- File content: notification text to display when the battery reaches that percentage exactly, or a state event occurs.
 
 ## Example
 

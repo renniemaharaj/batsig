@@ -9,6 +9,22 @@ import (
 )
 
 func runTest(args []string) error {
+	charging, args, flagPresent, err := parseAlertFlags(args)
+	if err != nil {
+		return err
+	}
+
+	if len(args) == 0 {
+		if !flagPresent {
+			return ErrUsage
+		}
+		message, err := readStateAlert(charging)
+		if err != nil {
+			return err
+		}
+		return notify.Send(context.Background(), "Battery state test", strings.TrimSpace(message))
+	}
+
 	if len(args) != 1 {
 		return ErrUsage
 	}
@@ -18,7 +34,7 @@ func runTest(args []string) error {
 		return fmt.Errorf("invalid percentage: %w", err)
 	}
 
-	message, err := readAlertMessage(pct)
+	message, err := readAlertMessage(pct, charging)
 	if err != nil {
 		return err
 	}

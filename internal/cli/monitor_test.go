@@ -2,7 +2,7 @@ package cli
 
 import "testing"
 
-func TestSelectLowestAboveOrEqualThreshold(t *testing.T) {
+func TestSelectExactThreshold(t *testing.T) {
 	cases := []struct {
 		name       string
 		thresholds []int
@@ -10,15 +10,14 @@ func TestSelectLowestAboveOrEqualThreshold(t *testing.T) {
 		want       int
 	}{
 		{"no thresholds", []int{}, 20, -1},
-		{"single above", []int{30}, 20, 30},
-		{"multiple above", []int{10, 15, 30, 40}, 20, 30},
-		{"exact match", []int{20, 30, 40}, 20, 20},
-		{"none above", []int{10, 15}, 20, -1},
+		{"exact match", []int{30}, 30, 30},
+		{"multiple values", []int{10, 15, 30, 40}, 30, 30},
+		{"no exact match", []int{10, 15, 30, 40}, 20, -1},
 	}
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			got := selectLowestAboveOrEqualThreshold(tc.thresholds, tc.current)
+			got := selectExactThreshold(tc.thresholds, tc.current)
 			if got != tc.want {
 				t.Fatalf("got %d, want %d", got, tc.want)
 			}

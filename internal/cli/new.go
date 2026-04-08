@@ -6,6 +6,10 @@ import (
 )
 
 func runNew(args []string) error {
+	charging, args, _, err := parseAlertFlags(args)
+	if err != nil {
+		return err
+	}
 	if len(args) < 2 {
 		return ErrUsage
 	}
@@ -15,5 +19,5 @@ func runNew(args []string) error {
 		return fmt.Errorf("invalid percentage: %w", err)
 	}
 
-	return createAlert(pct, strings.Join(args[1:], " "))
+	return createAlert(pct, strings.Join(args[1:], " "), charging)
 }

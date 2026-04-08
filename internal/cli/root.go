@@ -29,6 +29,8 @@ func Execute() error {
 			return ErrUsage
 		}
 		switch args[1] {
+		case "-c", "--charging", "-d", "--discharging":
+			return runStateAlert(args[1:])
 		case "new":
 			return runNew(args[2:])
 		case "set":
@@ -37,6 +39,8 @@ func Execute() error {
 			return runClear(args[2:])
 		case "test":
 			return runTest(args[2:])
+		case "mv":
+			return runMv(args[2:])
 		case "list":
 			return runList(args[2:])
 		default:
@@ -52,9 +56,10 @@ func PrintUsage(w io.Writer) {
 	fmt.Fprintln(w, "  batsig                # monitor battery and send alerts")
 	fmt.Fprintln(w, "  batsig daemon         # detach and run the monitor in the background")
 	fmt.Fprintln(w, "  batsig install        # install batsig binary, notification sound, and alerts to your local config")
-	fmt.Fprintln(w, "  batsig alert new <percentage> <message>")
-	fmt.Fprintln(w, "  batsig alert set <percentage> <message>")
-	fmt.Fprintln(w, "  batsig alert clear <percentage>")
-	fmt.Fprintln(w, "  batsig alert test <percentage>")
-	fmt.Fprintln(w, "  batsig alert list     # list configured alerts and their messages")
+	fmt.Fprintln(w, "  batsig alert new [-c] <percentage> <message>    # create an alert for discharging or charging with -c")
+	fmt.Fprintln(w, "  batsig alert set [-c] <percentage> <message>    # create or update an alert")
+	fmt.Fprintln(w, "  batsig alert clear [-c] <percentage>            # remove an alert from the selected folder")
+	fmt.Fprintln(w, "  batsig alert test [-c] <percentage>             # trigger a specific alert for testing")
+	fmt.Fprintln(w, "  batsig alert mv <percentage> <charging|discharging>  # move an alert between folders")
+	fmt.Fprintln(w, "  batsig alert list                               # list configured alerts and their messages")
 }
