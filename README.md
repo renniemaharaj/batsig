@@ -10,7 +10,7 @@ Alerts are stored in the XDG config directory as `batsig/alerts` (`$XDG_CONFIG_H
 - `batsig daemon`
   - Detach and run the monitor in the background.
 - `batsig install`
-  - Install the `batsig` binary to your user bin directory, copy `notification.wav` to your config, and pre-install the local `alerts` folder.
+  - Install the `batsig` binary to your user bin directory, copy `notification.wav` to your config, and pre-install the local `alerts` folder, including charge/discharge state alerts.
 - `batsig alert -c <message>`
   - Set the charging state alert message for when wall power is connected.
 - `batsig alert -d <message>`

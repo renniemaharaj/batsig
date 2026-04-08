@@ -3,6 +3,7 @@ package cli
 import (
 	"fmt"
 	"io"
+	"io/fs"
 	"os"
 	"path/filepath"
 )
@@ -94,27 +95,34 @@ func installAlerts(cwd, execDir string) error {
 		return fmt.Errorf("unable to create alerts directory: %w", err)
 	}
 
-	entries, err := os.ReadDir(srcDir)
-	if err != nil {
-		return fmt.Errorf("unable to read source alerts directory: %w", err)
-	}
+	return copyAlertTree(srcDir, destDir)
+}
 
-	for _, entry := range entries {
-		if entry.IsDir() {
-			continue
-		}
-
-		srcFile := filepath.Join(srcDir, entry.Name())
-		destFile := filepath.Join(destDir, entry.Name())
-		if same, err := sameFile(srcFile, destFile); err == nil && same {
-			continue
-		}
-		if err := copyFile(srcFile, destFile, 0o644); err != nil {
+func copyAlertTree(srcDir, destDir string) error {
+	return filepath.WalkDir(srcDir, func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
 			return err
 		}
-	}
 
-	return nil
+		relPath, err := filepath.Rel(srcDir, path)
+		if err != nil {
+			return err
+		}
+
+		destPath := filepath.Join(destDir, relPath)
+		if d.IsDir() {
+			return os.MkdirAll(destPath, 0o755)
+		}
+
+		if destInfo, err := os.Stat(destPath); err == nil && destInfo.Mode().IsDir() {
+			return fmt.Errorf("destination path %q is a directory", destPath)
+		}
+
+		if same, err := sameFile(path, destPath); err == nil && same {
+			return nil
+		}
+		return copyFile(path, destPath, 0o644)
+	})
 }
 
 func userBinDir() (string, error) {
@@ -130,7 +138,9 @@ func userBinDir() (string, error) {
 func findLocalResource(name, cwd, execDir string) (string, bool, error) {
 	paths := []string{
 		filepath.Join(cwd, name),
+		filepath.Join(cwd, "assets", name),
 		filepath.Join(execDir, name),
+		filepath.Join(execDir, "assets", name),
 	}
 
 	for _, path := range paths {
@@ -145,7 +155,9 @@ func findLocalResource(name, cwd, execDir string) (string, bool, error) {
 func findLocalDirectory(name, cwd, execDir string) (string, bool, error) {
 	paths := []string{
 		filepath.Join(cwd, name),
+		filepath.Join(cwd, "assets", name),
 		filepath.Join(execDir, name),
+		filepath.Join(execDir, "assets", name),
 	}
 
 	for _, path := range paths {
