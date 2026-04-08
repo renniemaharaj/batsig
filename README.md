@@ -29,7 +29,8 @@ Alerts are stored in the XDG config directory as `batsig/alerts` (`$XDG_CONFIG_H
 ## Example
 
 ```bash
-batsig alert new 100 "Your battery is fully charged. You can safely unplug."
+batsig alert new 50 "Your battery halfway discharged. You may want to plug in your device."
+batsig daemon
 batsig alert clear 100
 ```
 
