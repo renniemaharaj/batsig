@@ -14,21 +14,40 @@ import (
 	"batsig/internal/upower"
 )
 
-const pollInterval = 30 * time.Second
+const (
+	pollInterval       = 30 * time.Second
+	firedResetInterval = 5 * time.Minute
+)
 
 func runMonitor() error {
 	ctx := context.Background()
 	fired := map[string]bool{}
 	var prevChargingState *bool
 
+	pollTicker := time.NewTicker(pollInterval)
+	defer pollTicker.Stop()
+	resetTicker := time.NewTicker(firedResetInterval)
+	defer resetTicker.Stop()
+
+	status, err := upower.Status()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "warning: unable to read battery status: %v\n", err)
+	} else {
+		checkAlerts(ctx, status, fired, &prevChargingState)
+	}
+
 	for {
-		status, err := upower.Status()
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "warning: unable to read battery status: %v\n", err)
-		} else {
-			checkAlerts(ctx, status, fired, &prevChargingState)
+		select {
+		case <-pollTicker.C:
+			status, err := upower.Status()
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "warning: unable to read battery status: %v\n", err)
+			} else {
+				checkAlerts(ctx, status, fired, &prevChargingState)
+			}
+		case <-resetTicker.C:
+			fired = map[string]bool{}
 		}
-		time.Sleep(pollInterval)
 	}
 }
 
